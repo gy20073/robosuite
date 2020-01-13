@@ -6,35 +6,35 @@
   <asset>
   <texture builtin="gradient" height="256" rgb1=".9 .9 1." rgb2=".2 .3 .4" type="skybox" width="256" />
     <texture builtin="checker" height="512" name="texplane" rgb1=".2 .3 .4" rgb2=".1 0.15 0.2" type="2d" width="512" />
-    <texture file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/arenas/../textures/light-wood.png" name="tex-light-wood" type="2d" />
-    <texture file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/arenas/../textures/dark-wood.png" name="tex-dark-wood" type="2d" />
+    <texture file="/mnt/shared/RL/robosuite/robosuite/models/assets/arenas/../textures/light-wood.png" name="tex-light-wood" type="2d" />
+    <texture file="/mnt/shared/RL/robosuite/robosuite/models/assets/arenas/../textures/dark-wood.png" name="tex-dark-wood" type="2d" />
     <material name="light-wood" reflectance="0.5" texrepeat="15 15" texture="tex-light-wood" texuniform="true" />
     <material name="dark-wood" reflectance="0.5" texrepeat="5 5" texture="tex-dark-wood" texuniform="true" />
     <material name="floorplane" reflectance="0.5" texrepeat="1 1" texture="texplane" texuniform="true" />
-  <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/robots/sawyer/meshes/pedestal.stl" name="pedestal" />
-    <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/robots/sawyer/meshes/base.stl" name="base" />
-    <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/robots/sawyer/meshes/l0.stl" name="l0" />
-    <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/robots/sawyer/meshes/head.stl" name="head" />
-    <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/robots/sawyer/meshes/l1.stl" name="l1" />
-    <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/robots/sawyer/meshes/l2.stl" name="l2" />
-    <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/robots/sawyer/meshes/l3.stl" name="l3" />
-    <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/robots/sawyer/meshes/l4.stl" name="l4" />
-    <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/robots/sawyer/meshes/l5.stl" name="l5" />
-    <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/robots/sawyer/meshes/l6.stl" name="l6" />
-  <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/grippers/meshes/two_finger_gripper/electric_gripper_base.STL" name="electric_gripper_base" />
-        <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/grippers/meshes/two_finger_gripper/standard_narrow.STL" name="standard_narrow" />
-        <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/grippers/meshes/two_finger_gripper/half_round_tip.STL" name="half_round_tip" />
-    <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/objects/meshes/milk.stl" name="milk_mesh" scale="0.9 0.9 0.9" />
-    <texture file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/objects/../textures/ceramic.png" name="tex-ceramic" />
+  <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/robots/sawyer/meshes/pedestal.stl" name="pedestal" />
+    <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/robots/sawyer/meshes/base.stl" name="base" />
+    <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/robots/sawyer/meshes/l0.stl" name="l0" />
+    <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/robots/sawyer/meshes/head.stl" name="head" />
+    <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/robots/sawyer/meshes/l1.stl" name="l1" />
+    <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/robots/sawyer/meshes/l2.stl" name="l2" />
+    <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/robots/sawyer/meshes/l3.stl" name="l3" />
+    <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/robots/sawyer/meshes/l4.stl" name="l4" />
+    <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/robots/sawyer/meshes/l5.stl" name="l5" />
+    <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/robots/sawyer/meshes/l6.stl" name="l6" />
+  <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/grippers/meshes/two_finger_gripper/electric_gripper_base.STL" name="electric_gripper_base" />
+        <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/grippers/meshes/two_finger_gripper/standard_narrow.STL" name="standard_narrow" />
+        <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/grippers/meshes/two_finger_gripper/half_round_tip.STL" name="half_round_tip" />
+    <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/objects/meshes/milk.stl" name="milk_mesh" scale="0.9 0.9 0.9" />
+    <texture file="/mnt/shared/RL/robosuite/robosuite/models/assets/objects/../textures/ceramic.png" name="tex-ceramic" />
     <material name="ceramic" reflectance="0.5" texrepeat="1 1" texture="tex-ceramic" texuniform="true" />
-  <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/objects/meshes/bread.stl" name="bread_mesh" scale="0.8 0.8 0.8" />
-    <texture file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/objects/../textures/bread.png" name="tex-bread" type="2d" />
+  <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/objects/meshes/bread.stl" name="bread_mesh" scale="0.8 0.8 0.8" />
+    <texture file="/mnt/shared/RL/robosuite/robosuite/models/assets/objects/../textures/bread.png" name="tex-bread" type="2d" />
     <material name="bread" reflectance="0.7" texrepeat="15 15" texture="tex-bread" texuniform="true" />
-  <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/objects/meshes/cereal.stl" name="cereal_mesh" scale="0.4 1.0 0.4" />
-    <texture file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/objects/../textures/cereal.png" name="tex-cereal" rgb1="1 1 1" type="cube" />
+  <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/objects/meshes/cereal.stl" name="cereal_mesh" scale="0.4 1.0 0.4" />
+    <texture file="/mnt/shared/RL/robosuite/robosuite/models/assets/objects/../textures/cereal.png" name="tex-cereal" rgb1="1 1 1" type="cube" />
     <material name="cereal" reflectance="0.5" texrepeat="3 3" texture="tex-cereal" texuniform="false" />
-  <mesh file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/objects/meshes/can.stl" name="can_mesh" />
-    <texture file="/Users/ajaymandlekar/MujocoManipulation/robosuite/models/assets/objects/../textures/can.png" name="tex-can" />
+  <mesh file="/mnt/shared/RL/robosuite/robosuite/models/assets/objects/meshes/can.stl" name="can_mesh" />
+    <texture file="/mnt/shared/RL/robosuite/robosuite/models/assets/objects/../textures/can.png" name="tex-can" />
     <material name="coke" reflectance="0.7" texrepeat="5 5" texture="tex-can" texuniform="true" />
   </asset>
 
