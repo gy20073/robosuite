@@ -30,16 +30,20 @@ if __name__ == '__main__':
     for i in range(200):
         env.render()
 
-    sim_state = env.sim.get_state()
+    x = random.random() / 2
+    y = random.random() / 2
 
-    env.teleport_object(objs, x=m_pos[0], y=m_pos[1]+0.5)
+    m_pos[0] += random.random() / 5
+    m_pos[1] += random.random() / 5
 
-    for i in range(300):
+    env.teleport_object(objs, x=m_pos[0], y=m_pos[1])
+
+    do_action = False
+
+    obs = None
+    for i in range(1000):
         action = np.random.randn(env.dof)
         obs, reward, done, _ = env.step(action)
         env.render()
 
-    sim_state = env.sim.get_state()
-    m_pos = sim_state.qpos[pp:pp + 3]
-    print('not in bin: ', env.not_in_bin(m_pos))
-    print('m_pos: ', m_pos)
+    print('obs: ', obs)

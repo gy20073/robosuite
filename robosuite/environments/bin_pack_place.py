@@ -251,7 +251,10 @@ class BinPackPlace(SawyerEnv):
                 self.sim.set_state(sim_state)
                 self.sim.forward()
 
-    def teleport_object(self, obj, x, y, z=2):
+    def remove_object(self, obj):
+        self.teleport_object(obj, x=10, y=10)
+
+    def teleport_object(self, obj, x, y, z=1.5):
         """
         Teleport an object to a certain position (x, y, z).
         """
@@ -321,8 +324,9 @@ class BinPackPlace(SawyerEnv):
 
     def reward(self, action=None):
         # compute sparse rewards
+        last_num = np.sum(self.objects_in_bins)
         self._check_success()
-        reward = np.sum(self.objects_in_bins)
+        reward = np.sum(self.objects_in_bins) - last_num
 
         # add in shaped rewards
         if self.reward_shaping:
@@ -483,9 +487,9 @@ class BinPackPlace(SawyerEnv):
 
             for i in range(len(self.item_names_org)):
 
-                if self.single_object_mode == 2 and self.object_id != i:
-                    # Skip adding to observations
-                    continue
+                # if self.single_object_mode == 2 and self.object_id != i:
+                #     # Skip adding to observations
+                #     continue
 
                 obj_str = str(self.item_names_org[i]) + "0"
                 obj_pos = np.array(self.sim.data.body_xpos[self.obj_body_id[obj_str]])
