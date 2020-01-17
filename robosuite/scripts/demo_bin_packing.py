@@ -1,11 +1,14 @@
 import random
+import numpy as np
 import robosuite as suite
-from robosuite.wrappers import GymWrapper
+from robosuite.wrappers import MyGymWrapper
 
 if __name__ == "__main__":
 
     # Notice how the environment is wrapped by the wrapper
-    env = GymWrapper(
+    low = np.array([-0.1, -0.1])
+    high = np.array([0.8,0.8])
+    env = MyGymWrapper(
         suite.make(
             'BinPackPlace',
             has_renderer=True,
@@ -13,21 +16,25 @@ if __name__ == "__main__":
             ignore_done=True,
             use_camera_obs=False,
             control_freq=1,
-        )
+        ),
+        action_bound=(low, high)
     )
+
+    env.viewer.set_camera(camera_id=0)
 
     for i_episode in range(20):
         observation = env.reset()
         objs = env.mujoco_objects.items()
-        for obj_name, obj_mjcf in objs:
-            reward = 0
-            position = [random.random(), random.random()]
-            env.teleport_object(obj_name, x=position[0], y=position[1])
+        for i in range(100):
 
             action = env.action_space.sample()
             observation, reward, done, info = env.step(action)
 
-            for i in range(200):
+            for _ in range(1000):
                 env.render()
 
             print("reward: ", reward)
+
+            if done:
+                print('Done!')
+                break

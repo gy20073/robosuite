@@ -5,6 +5,7 @@ import numpy as np
 import robosuite.utils.transform_utils as T
 from robosuite.utils.mjcf_utils import string_to_array
 from robosuite.environments.sawyer import SawyerEnv
+from gym.envs.mujoco import mujoco_env
 
 from robosuite.models.arenas import BinPackingArena
 from robosuite.models.objects import (
@@ -23,7 +24,7 @@ from robosuite.models.objects import (
 from robosuite.models.tasks import BinPackingTask, UniformRandomSampler
 
 
-class BinPackPlace(SawyerEnv):
+class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
     def __init__(
         self,
         gripper_type="TwoFingerGripper",
@@ -272,6 +273,58 @@ class BinPackPlace(SawyerEnv):
         self.sim.set_state(sim_state)
         self.sim.forward()
 
+
+    def take_an_object(self, action):
+        print('Take an object!')
+        obj_idx = (self.objects_not_take != 0).argmax(axis=0)
+        self.objects_not_take[obj_idx] = 0
+
+        obj = self.object_names[obj_idx]
+        self.teleport_object(obj, action[0], action[1])
+
+    def _pre_action(self, action):
+        # gravity compensation
+        self.sim.data.qfrc_applied[
+            self._ref_joint_vel_indexes
+        ] = self.sim.data.qfrc_bias[self._ref_joint_vel_indexes]
+
+        if self.use_indicator_object:
+            self.sim.data.qfrc_applied[
+                self._ref_indicator_vel_low : self._ref_indicator_vel_high
+            ] = self.sim.data.qfrc_bias[
+                self._ref_indicator_vel_low : self._ref_indicator_vel_high
+            ]
+
+    def _post_action(self, action):
+        """
+        (Optional) does gripper visualization after actions.
+        """
+        ret = super()._post_action(action)
+        self._gripper_visualization()
+        return ret
+
+    def step(self, action):
+        """Takes a step in simulation with control command @action."""
+        if self.done:
+            raise ValueError("executing action in terminated episode")
+
+        # take an obj
+        self.take_an_object(action)
+
+        self.timestep += 1
+        self._pre_action(None)
+        end_time = self.cur_time + self.control_timestep
+        while self.cur_time < end_time:
+            self.sim.step()
+            self.cur_time += self.model_timestep
+
+        reward, done, info = self._post_action(action)
+
+        # done
+        done = np.all(self.objects_not_take == 0)
+
+        return self._get_observation(), reward, done, info
+
     def _get_reference(self):
         super()._get_reference()
         self.obj_body_id = {}
@@ -295,6 +348,7 @@ class BinPackPlace(SawyerEnv):
 
         # keep track of which objects are in their corresponding bins
         self.objects_in_bins = np.zeros(len(self.ob_inits))
+        self.objects_not_take = np.ones(len(self.ob_inits))
 
         # target locations in bin for each object type
         self.target_bin_placements = np.zeros((len(self.ob_inits), 3))
@@ -327,6 +381,7 @@ class BinPackPlace(SawyerEnv):
         last_num = np.sum(self.objects_in_bins)
         self._check_success()
         reward = np.sum(self.objects_in_bins) - last_num
+
 
         # add in shaped rewards
         if self.reward_shaping:
