@@ -275,7 +275,7 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
 
 
     def take_an_object(self, action):
-        print('Take an object!')
+        # print('Take an object!')
         obj_idx = (self.objects_not_take != 0).argmax(axis=0)
         self.objects_not_take[obj_idx] = 0
 
@@ -387,6 +387,8 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         if self.reward_shaping:
             staged_rewards = self.staged_rewards()
             reward += max(staged_rewards)
+
+        print('Reward: ', reward)
         return reward
 
     def staged_rewards(self):

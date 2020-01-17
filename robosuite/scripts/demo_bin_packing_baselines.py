@@ -1,5 +1,6 @@
 import os
 import tensorflow as tf
+import numpy as np
 from gym.wrappers import TimeLimit
 from baselines.ppo2 import ppo2
 from baselines import logger
@@ -12,7 +13,7 @@ from robosuite.environments.bin_pack_place import BinPackPlace
 
 import random
 import robosuite as suite
-from robosuite.wrappers import GymWrapper
+from robosuite.wrappers import MyGymWrapper
 
 import warnings
 
@@ -51,7 +52,10 @@ if __name__ == "__main__":
             control_freq=1,
         )
 
-    env = GymWrapper(env)
+    low = np.array([-1, -1])
+    high = np.array([1, 1])
+
+    env = MyGymWrapper(env, (low, high))
     env = Monitor(env, SAVE_PATH, allow_early_resets=True)
     env = DummyVecEnv([lambda: env])
     env = VecNormalize(env)
