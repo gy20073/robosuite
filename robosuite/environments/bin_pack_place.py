@@ -232,8 +232,7 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         )
         self.model.place_objects()
         self.model.place_visual()
-        # import ipdb
-        # ipdb.set_trace()
+
         self.bin_pos = string_to_array(self.model.bin2_body.get("pos"))
         self.bin_size = self.model.bin_size
 
@@ -322,6 +321,9 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
 
         # done
         done = np.all(self.objects_not_take == 0)
+
+        if done:
+            print('Done!')
 
         return self._get_observation(), reward, done, info
 

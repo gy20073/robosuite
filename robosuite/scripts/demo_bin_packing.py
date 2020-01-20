@@ -6,8 +6,10 @@ from robosuite.wrappers import MyGymWrapper
 if __name__ == "__main__":
 
     # Notice how the environment is wrapped by the wrapper
-    low = np.array([-0.1, -0.1])
-    high = np.array([0.8,0.8])
+
+    low = np.array([0.5, 0.15])
+    high = np.array([0.7, 0.6])
+
     env = MyGymWrapper(
         suite.make(
             'BinPackPlace',
@@ -30,11 +32,10 @@ if __name__ == "__main__":
             action = env.action_space.sample()
             observation, reward, done, info = env.step(action)
 
-            for _ in range(1000):
+            for _ in range(300):
                 env.render()
 
             print("reward: ", reward)
 
             if done:
-                print('Done!')
                 break

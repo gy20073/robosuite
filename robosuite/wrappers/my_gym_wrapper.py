@@ -12,7 +12,7 @@ from robosuite.wrappers import Wrapper
 class MyGymWrapper(Wrapper):
     env = None
 
-    def __init__(self, env, action_bound, keys=None):
+    def __init__(self, env, action_bound, num_envs=8, keys='object-state'):
         """
         Initializes the Gym wrapper.
 
@@ -23,6 +23,7 @@ class MyGymWrapper(Wrapper):
                 consist of concatenated keys from the wrapped environment's
                 observation dictionary. Defaults to robot-state and object-state.
         """
+        super().__init__(env=env)
         self.env = env
 
         if keys is None:
@@ -39,6 +40,8 @@ class MyGymWrapper(Wrapper):
 
         low, high = action_bound
         self.action_space = spaces.Box(low=low, high=high)
+
+        self.num_envs = num_envs
 
     def _flatten_obs(self, obs_dict, verbose=False):
         """
@@ -62,3 +65,7 @@ class MyGymWrapper(Wrapper):
     def step(self, action):
         ob_dict, reward, done, info = self.env.step(action)
         return self._flatten_obs(ob_dict), reward, done, info
+
+    @property
+    def dt(self):
+        return self.model.opt.timestep * self.frame_skip
