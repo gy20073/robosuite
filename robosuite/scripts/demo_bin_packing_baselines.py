@@ -42,7 +42,6 @@ def train(env, save=False):
         model.save(SAVE_PATH)
 
 
-## TODO: Problems: action space bound useless
 if __name__ == "__main__":
 
     # low = np.array([0.405, 0.135])
