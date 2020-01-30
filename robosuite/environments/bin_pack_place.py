@@ -254,7 +254,7 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
     def remove_object(self, obj):
         self.teleport_object(obj, x=10, y=10)
 
-    def teleport_object(self, obj, x, y, z=1.5):
+    def teleport_object(self, obj, x, y, z=1.2):
         """
         Teleport an object to a certain position (x, y, z).
         """
@@ -279,7 +279,10 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         self.objects_not_take[obj_idx] = 0
 
         obj = self.object_names[obj_idx]
-        self.teleport_object(obj, action[0], action[1])
+        if len(action) > 2:
+            self.teleport_object(obj, action[0], action[1], action[2])
+        else:
+            self.teleport_object(obj, action[0], action[1])
 
     def _pre_action(self, action):
         # gravity compensation
@@ -322,8 +325,8 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         # done
         done = np.all(self.objects_not_take == 0)
 
-        if done:
-            print('Done!')
+        # if done:
+        #     print('Done!')
 
         return self._get_observation(), reward, done, info
 
@@ -390,7 +393,8 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
             staged_rewards = self.staged_rewards()
             reward += max(staged_rewards)
 
-        print('Reward: ', reward)
+        if reward != 0:
+            print('Reward: ', reward)
         return reward
 
     def staged_rewards(self):

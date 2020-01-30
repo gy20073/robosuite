@@ -46,7 +46,7 @@ class BinPackingTask(Task):
         self.arena = mujoco_arena
         self.bin_offset = mujoco_arena.bin_abs
         self.bin2_offset = self.bin_offset.copy()
-        print("Bin 2 offset:", self.bin2_offset)
+        # print("Bin 2 offset:", self.bin2_offset)
         self.bin2_offset[0] = 0.6
         self.bin2_offset[1] = 0.68 - 0.3
 

@@ -13,62 +13,78 @@ from robosuite.environments.bin_pack_place import BinPackPlace
 from gym import spaces
 
 import random
+import argparse
 import robosuite as suite
 from robosuite.wrappers import MyGymWrapper
 
-import warnings
 
-warnings.filterwarnings('ignore')
-
-PATH = os.path.dirname(os.path.realpath(__file__))
-SAVE_DIR = None
-SAVE_PATH = None
-
-
-def train(env, save=False):
+def train(args, env):
     config = tf.ConfigProto(allow_soft_placement=True,
                             intra_op_parallelism_threads=1,
                             inter_op_parallelism_threads=1)
     config.gpu_options.allow_growth = True
     get_session(config=config)
 
-    network = 'mlp'
+    network = args.network
     logger.configure()
-    # import ipdb
-    # ipdb.set_trace()
-    model = ppo2.learn(network=network, env=env, total_timesteps=50000000, nsteps=1000)
 
-    if save:
-        model.save(SAVE_PATH)
+    model = ppo2.learn(network=network, env=env,
+                       total_timesteps=args.total_timesteps, nsteps=args.nsteps, save_interval=args.save_interval, lr=args.lr,
+                       num_layers=args.num_layers)
+
+    model.save(args.save_path)
 
 
 if __name__ == "__main__":
 
-    # low = np.array([0.405, 0.135])
-    # high = np.array([0.8, 0.625])
+    ## params
+    parser = argparse.ArgumentParser(description='Baseline Training...')
+
+    parser.add_argument('--out_dir', type=str, default='results/baselines')
+    parser.add_argument('--alg', type=str, default='ppo')
+    parser.add_argument('--num_envs', type=int, default=4)
+    parser.add_argument('--render', type=bool, default=False)
+    parser.add_argument('--control_freq', type=int, default=1)
+
+    parser.add_argument('--total_timesteps', type=int, default=90000)
+    parser.add_argument('--nsteps', type=int, default=128)
+    parser.add_argument('--save_interval', type=int, default=100)
+    parser.add_argument('--lr', type=float, default=1e-3)
+    parser.add_argument('--network', type=str, default='mlp')
+    parser.add_argument('--num_layers', type=int, default=2)
+
+
+    args = parser.parse_args()
+
+    ## const
+    PATH = os.path.dirname(os.path.realpath(__file__))
     low = np.array([0.5, 0.15])
     high = np.array([0.7, 0.6])
 
+    ## make env
     # Notice how the environment is wrapped by the wrapper
     env = suite.make(
         'BinPackPlace',
-        has_renderer=False,
+        has_renderer=args.render,
         has_offscreen_renderer=False,
-        ignore_done=True,
+        ignore_done=False,
         use_camera_obs=False,
-        control_freq=1
+        control_freq=args.control_freq
     )
 
-    num_envs = 8
 
-    SAVE_DIR = os.path.join(PATH, 'results', 'baselines', 'ppo')
-    if not os.path.exists(SAVE_DIR):
-        os.mkdir(SAVE_DIR)
-    SAVE_PATH = os.path.join(SAVE_DIR, 'model.pth')
+    info_dir = args.alg + '_' + args.network + '_' + str(args.num_layers) + 'layer_' +\
+               str(args.lr) + 'lr_' + str(args.nsteps) + 'stpes_' + str(args.num_envs) + 'async'
 
-    env = MyGymWrapper(env, (low, high), num_envs=num_envs)
-    env = Monitor(env, SAVE_DIR, allow_early_resets=True)
+    args.save_dir = os.path.join(PATH, args.out_dir, info_dir)
+    if not os.path.exists(args.save_dir):
+        os.mkdir(args.save_dir)
+
+    args.save_path = os.path.join(args.save_dir, 'model.pth')
+
+    env = MyGymWrapper(env, (low, high), num_envs=args.num_envs)
+    env = Monitor(env, args.save_dir, allow_early_resets=True)
     env = DummyVecEnv([lambda: env])
-    env = VecNormalize(env)
+    # env = VecNormalize(env)
 
-    train(env, True)
+    train(args, env)
