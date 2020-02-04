@@ -129,7 +129,7 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         # task settings
         self.obj_names = obj_names
         self.single_object_mode = single_object_mode
-        self.object_to_id = {"milk": 0, "bread": 1, "cereal": 2, "can": 3}
+        self.object_to_id = {"Milk": 0, "Bread": 1, "Cereal": 2, "Can": 3}
         self.obj_to_use = None
 
         # settings for table top
@@ -179,26 +179,28 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         ]
 
     def _name2obj(self, name):
-        assert name in ['Milk', 'Bread', 'Cereal', 'Can']
+        assert name in self.object_to_id.keys()
 
         if name is 'Milk':
-            return 0, MilkObject, MilkVisualObject
+            return MilkObject, MilkVisualObject
         elif name is 'Bread':
-            return 1, BreadObject, BreadVisualObject
+            return BreadObject, BreadVisualObject
         elif name is 'Cereal':
-            return 2, CerealObject, CerealVisualObject
+            return CerealObject, CerealVisualObject
         elif name is 'Can':
-            return 3, CanObject, CanVisualObject
+            return CanObject, CanVisualObject
 
     def _make_objects(self, names):
         self.item_names = []
         self.ob_inits = []
         self.vis_inits = []
 
-        idx = [0] * 4
+        idx = [0] * len(self.object_to_id)
 
         for name in names:
-            ix, obj, vis_obj = self._name2obj(name)
+            obj, vis_obj = self._name2obj(name)
+
+            ix = self.object_to_id[name]
             idx[ix] += 1
 
             self.item_names.append(name + str(idx[ix]))
