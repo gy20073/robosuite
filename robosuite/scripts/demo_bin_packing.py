@@ -15,6 +15,7 @@ if __name__ == "__main__":
 
     print('low: ', low)
     print('high: ', high)
+    obj_names = ['Milk'] * 4 + ['Bread'] * 3 + ['Cereal'] * 5 + ['Can'] * 6
 
     env = MyGymWrapper(
         suite.make(
@@ -24,6 +25,7 @@ if __name__ == "__main__":
             ignore_done=True,
             use_camera_obs=False,
             control_freq=1,
+            obj_names=obj_names,
         ),
         action_bound=(low, high)
     )

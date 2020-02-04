@@ -49,6 +49,8 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         camera_height=256,
         camera_width=256,
         camera_depth=False,
+
+        obj_names=['Milk'] * 4 + ['Bread'] * 3,
     ):
         """
         Args:
@@ -125,6 +127,7 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         """
 
         # task settings
+        self.obj_names = obj_names
         self.single_object_mode = single_object_mode
         self.object_to_id = {"milk": 0, "bread": 1, "cereal": 2, "can": 3}
         self.obj_to_use = None
@@ -175,9 +178,34 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
             self.sim.model._geom_name2id[k] for k in self.collision_check_geom_names
         ]
 
-    ## TODO: make objects by names
+    def _name2obj(self, name):
+        assert name in ['Milk', 'Bread', 'Cereal', 'Can']
+
+        if name is 'Milk':
+            return 0, MilkObject, MilkVisualObject
+        elif name is 'Bread':
+            return 1, BreadObject, BreadVisualObject
+        elif name is 'Cereal':
+            return 2, CerealObject, CerealVisualObject
+        elif name is 'Can':
+            return 3, CanObject, CanVisualObject
+
     def _make_objects(self, names):
-        pass
+        self.item_names = []
+        self.ob_inits = []
+        self.vis_inits = []
+
+        idx = [0] * 4
+
+        for name in names:
+            ix, obj, vis_obj = self._name2obj(name)
+            idx[ix] += 1
+
+            self.item_names.append(name + str(idx[ix]))
+            self.ob_inits.append(obj)
+            self.vis_inits.append(vis_obj)
+
+        self.item_names_org = list(self.item_names)
 
     def _load_model(self):
         super()._load_model()
@@ -194,15 +222,9 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         # The sawyer robot has a pedestal, we want to align it with the table
         self.mujoco_arena.set_origin([.5, -0.3, 0])
 
-        self.ob_inits = [MilkObject, BreadObject, CerealObject, CanObject]
-        self.vis_inits = [
-            MilkVisualObject,
-            BreadVisualObject,
-            CerealVisualObject,
-            CanVisualObject,
-        ]
-        self.item_names = ["Milk", "Bread", "Cereal", "Can"]
-        self.item_names_org = list(self.item_names)
+        # make objects by names
+        self._make_objects(self.obj_names)
+
         # self.obj_to_use = (self.item_names[0] + "{}").format(0)
 
         lst = []
@@ -213,7 +235,7 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         lst = []
         for i in range(len(self.ob_inits)):
             ob = self.ob_inits[i]()
-            lst.append((str(self.item_names[i]) + "0", ob))
+            lst.append((str(self.item_names[i]), ob))
 
         self.mujoco_objects = OrderedDict(lst)
         self.n_objects = len(self.mujoco_objects)
@@ -338,7 +360,7 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         ]
 
         for i in range(len(self.ob_inits)):
-            obj_str = str(self.item_names[i]) + "0"
+            obj_str = str(self.item_names[i])
             self.obj_body_id[obj_str] = self.sim.model.body_name2id(obj_str)
             self.obj_geom_id[obj_str] = self.sim.model.geom_name2id(obj_str)
 
@@ -404,7 +426,7 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         for i in range(len(self.ob_inits)):
             if self.objects_in_bins[i]:
                 continue
-            obj_str = str(self.item_names[i]) + "0"
+            obj_str = str(self.item_names[i])
             objs_to_reach.append(self.obj_body_id[obj_str])
             geoms_to_grasp.append(self.obj_geom_id[obj_str])
             target_bin_placements.append(self.target_bin_placements[i])
@@ -539,7 +561,7 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
 
             for i in range(len(self.item_names_org)):
 
-                obj_str = str(self.item_names_org[i]) + "0"
+                obj_str = str(self.item_names_org[i])
                 obj_pos = np.array(self.sim.data.body_xpos[self.obj_body_id[obj_str]])
                 obj_quat = T.convert_quat(
                     self.sim.data.body_xquat[self.obj_body_id[obj_str]], to="xyzw"
@@ -585,7 +607,7 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         # remember objects that are in the correct bins
         gripper_site_pos = self.sim.data.site_xpos[self.eef_site_id]
         for i in range(len(self.ob_inits)):
-            obj_str = str(self.item_names[i]) + "0"
+            obj_str = str(self.item_names[i])
             obj_pos = self.sim.data.body_xpos[self.obj_body_id[obj_str]]
             dist = np.linalg.norm(gripper_site_pos - obj_pos)
             r_reach = 1 - np.tanh(10.0 * dist)
