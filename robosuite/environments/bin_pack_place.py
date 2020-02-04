@@ -127,15 +127,6 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         # task settings
         self.single_object_mode = single_object_mode
         self.object_to_id = {"milk": 0, "bread": 1, "cereal": 2, "can": 3}
-        if object_type is not None:
-            assert (
-                object_type in self.object_to_id.keys()
-            ), "invalid @object_type argument - choose one of {}".format(
-                list(self.object_to_id.keys())
-            )
-            self.object_id = self.object_to_id[
-                object_type
-            ]  # use for convenient indexing
         self.obj_to_use = None
 
         # settings for table top
@@ -184,6 +175,10 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
             self.sim.model._geom_name2id[k] for k in self.collision_check_geom_names
         ]
 
+    ## TODO: make objects by names
+    def _make_objects(self, names):
+        pass
+
     def _load_model(self):
         super()._load_model()
         self.mujoco_robot.set_base_xpos([0, 0, 0])
@@ -208,7 +203,7 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         ]
         self.item_names = ["Milk", "Bread", "Cereal", "Can"]
         self.item_names_org = list(self.item_names)
-        self.obj_to_use = (self.item_names[0] + "{}").format(0)
+        # self.obj_to_use = (self.item_names[0] + "{}").format(0)
 
         lst = []
         for j in range(len(self.vis_inits)):
@@ -231,7 +226,7 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
             self.visual_objects,
         )
         self.model.place_objects()
-        self.model.place_visual()
+        # self.model.place_visual()
 
         self.bin_pos = string_to_array(self.model.bin2_body.get("pos"))
         self.bin_size = self.model.bin_size
@@ -314,7 +309,7 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         self.take_an_object(action)
 
         self.timestep += 1
-        self._pre_action(None)
+        self._pre_action(action)
         end_time = self.cur_time + self.control_timestep
         while self.cur_time < end_time:
             self.sim.step()
@@ -325,8 +320,8 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         # done
         done = np.all(self.objects_not_take == 0)
 
-        # if done:
-        #     print('Done!')
+        if done:
+            print('Done!')
 
         return self._get_observation(), reward, done, info
 
@@ -374,12 +369,6 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
 
         # reset positions of objects, and move objects out of the scene depending on the mode
         self.model.place_objects()
-        if self.single_object_mode == 1:
-            self.obj_to_use = (random.choice(self.item_names) + "{}").format(0)
-            self.clear_objects(self.obj_to_use)
-        elif self.single_object_mode == 2:
-            self.obj_to_use = (self.item_names[self.object_id] + "{}").format(0)
-            self.clear_objects(self.obj_to_use)
 
     def reward(self, action=None):
         # compute sparse rewards
@@ -550,10 +539,6 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
 
             for i in range(len(self.item_names_org)):
 
-                # if self.single_object_mode == 2 and self.object_id != i:
-                #     # Skip adding to observations
-                #     continue
-
                 obj_str = str(self.item_names_org[i]) + "0"
                 obj_pos = np.array(self.sim.data.body_xpos[self.obj_body_id[obj_str]])
                 obj_quat = T.convert_quat(
@@ -573,17 +558,6 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
                 object_state_keys.append("{}_quat".format(obj_str))
                 object_state_keys.append("{}_to_eef_pos".format(obj_str))
                 object_state_keys.append("{}_to_eef_quat".format(obj_str))
-
-            if self.single_object_mode == 1:
-                # Zero out other objects observations
-                for obj_str, obj_mjcf in self.mujoco_objects.items():
-                    if obj_str == self.obj_to_use:
-                        continue
-                    else:
-                        di["{}_pos".format(obj_str)] *= 0.0
-                        di["{}_quat".format(obj_str)] *= 0.0
-                        di["{}_to_eef_pos".format(obj_str)] *= 0.0
-                        di["{}_to_eef_quat".format(obj_str)] *= 0.0
 
             di["object-state"] = np.concatenate([di[k] for k in object_state_keys])
 
@@ -618,10 +592,6 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
             self.objects_in_bins[i] = int(
                 (not self.not_in_bin(obj_pos)) and r_reach < 0.6
             )
-
-        # returns True if a single object is in the correct bin
-        if self.single_object_mode == 1 or self.single_object_mode == 2:
-            return np.sum(self.objects_in_bins) > 0
 
         # returns True if all objects are in correct bins
         return np.sum(self.objects_in_bins) == len(self.ob_inits)
