@@ -18,12 +18,13 @@ import robosuite as suite
 from robosuite.wrappers import MyGymWrapper
 from PIL import Image
 
-LOAD_PATH = '/tmp/openai-2020-01-29-09-27-28-458233/checkpoints/00700'
+LOAD_PATH = 'results/baselines/ppo_mlp_2layer_0.001lr_256stpes_4async_more_obj/model.pth'
 
 if __name__ == "__main__":
 
     low = np.array([0.5, 0.15])
     high = np.array([0.7, 0.6])
+    obj_names = (['Milk'] * 2 + ['Bread'] * 2 + ['Cereal'] * 2 + ['Can'] * 2) * 2
 
     env = suite.make(
         'BinPackPlace',
@@ -31,7 +32,8 @@ if __name__ == "__main__":
         has_offscreen_renderer=False,
         ignore_done=False,
         use_camera_obs=False,
-        control_freq=1
+        control_freq=1,
+        obj_names=obj_names
     )
 
     env.viewer.set_camera(camera_id=0)

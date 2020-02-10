@@ -15,12 +15,14 @@ if __name__ == "__main__":
 
     print('low: ', low)
     print('high: ', high)
-    obj_names = ['Milk'] * 4 + ['Bread'] * 3 + ['Cereal'] * 5 + ['Can'] * 6
+    obj_names = ['Milk'] * 1 + ['Bread'] * 1 + ['Cereal'] * 1 + ['Can'] * 1
+
+    has_renderer = True
 
     env = MyGymWrapper(
         suite.make(
             'BinPackPlace',
-            has_renderer=True,
+            has_renderer=has_renderer,
             has_offscreen_renderer=False,
             ignore_done=True,
             use_camera_obs=False,
@@ -36,13 +38,15 @@ if __name__ == "__main__":
         observation = env.reset()
         for i in range(20):
 
-            for _ in range(200):
-                env.render()
+            if has_renderer:
+                for _ in range(200):
+                    env.render()
 
             action = env.action_space.sample()
             observation, reward, done, info = env.step(action)
 
             if done:
-                for _ in range(200):
-                    env.render()
+                if has_renderer:
+                    for _ in range(200):
+                        env.render()
                 break

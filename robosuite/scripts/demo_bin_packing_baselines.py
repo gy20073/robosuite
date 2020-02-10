@@ -52,6 +52,7 @@ if __name__ == "__main__":
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--network', type=str, default='mlp')
     parser.add_argument('--num_layers', type=int, default=2)
+    parser.add_argument('--debug', type=str, default='more_obj')
 
 
     args = parser.parse_args()
@@ -60,6 +61,9 @@ if __name__ == "__main__":
     PATH = os.path.dirname(os.path.realpath(__file__))
     low = np.array([0.5, 0.15])
     high = np.array([0.7, 0.6])
+    # obj_names = (['Milk'] * 2 + ['Bread'] * 2 + ['Cereal'] * 2 + ['Can'] * 2) * 2
+
+    obj_names = ['Milk'] + ['Bread'] + ['Cereal'] + ['Can']
 
     ## make env
     # Notice how the environment is wrapped by the wrapper
@@ -69,16 +73,17 @@ if __name__ == "__main__":
         has_offscreen_renderer=False,
         ignore_done=False,
         use_camera_obs=False,
-        control_freq=args.control_freq
+        control_freq=args.control_freq,
+        obj_names=obj_names
     )
 
 
     info_dir = args.alg + '_' + args.network + '_' + str(args.num_layers) + 'layer_' +\
-               str(args.lr) + 'lr_' + str(args.nsteps) + 'stpes_' + str(args.num_envs) + 'async'
+               str(args.lr) + 'lr_' + str(args.nsteps) + 'stpes_' + str(args.num_envs) + 'async_' + args.debug
 
     args.save_dir = os.path.join(PATH, args.out_dir, info_dir)
     if not os.path.exists(args.save_dir):
-        os.mkdir(args.save_dir)
+        os.makedirs(args.save_dir)
 
     args.save_path = os.path.join(args.save_dir, 'model.pth')
 
@@ -86,5 +91,8 @@ if __name__ == "__main__":
     env = Monitor(env, args.save_dir, allow_early_resets=True)
     env = DummyVecEnv([lambda: env])
     # env = VecNormalize(env)
+
+    ## log
+    print(args)
 
     train(args, env)

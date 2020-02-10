@@ -1,3 +1,7 @@
+robosuite/scripts/demo
+robosuite/scripts/results
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
