@@ -28,9 +28,14 @@ def train(args, env):
     network = args.network
     logger.configure()
 
-    model = ppo2.learn(network=network, env=env,
-                       total_timesteps=args.total_timesteps, nsteps=args.nsteps, save_interval=args.save_interval, lr=args.lr,
-                       num_layers=args.num_layers)
+    if os.path.exists(args.load_path):
+        model = ppo2.learn(network=network, env=env, load_path=args.load_path,
+                           total_timesteps=args.total_timesteps, nsteps=args.nsteps, save_interval=args.save_interval, lr=args.lr)
+    else:
+        print('Warning: PATH ', args.load_path, ' does not exist.')
+        model = ppo2.learn(network=network, env=env,
+                           total_timesteps=args.total_timesteps, nsteps=args.nsteps, save_interval=args.save_interval,
+                           lr=args.lr)
 
     model.save(args.save_path)
 
@@ -45,14 +50,14 @@ if __name__ == "__main__":
     parser.add_argument('--num_envs', type=int, default=4)
     parser.add_argument('--render', type=bool, default=False)
     parser.add_argument('--control_freq', type=int, default=1)
+    parser.add_argument('--load_path', type=str, default='gg')
 
     parser.add_argument('--total_timesteps', type=int, default=90000)
     parser.add_argument('--nsteps', type=int, default=128)
     parser.add_argument('--save_interval', type=int, default=100)
     parser.add_argument('--lr', type=float, default=1e-3)
-    parser.add_argument('--network', type=str, default='mlp')
-    parser.add_argument('--num_layers', type=int, default=2)
-    parser.add_argument('--debug', type=str, default='more_obj')
+    parser.add_argument('--network', type=str, default='cnn')
+    parser.add_argument('--debug', type=str, default='img')
 
 
     args = parser.parse_args()
@@ -70,15 +75,17 @@ if __name__ == "__main__":
     env = suite.make(
         'BinPackPlace',
         has_renderer=args.render,
-        has_offscreen_renderer=False,
+        has_offscreen_renderer=True,
         ignore_done=False,
-        use_camera_obs=False,
+        use_camera_obs=True,
         control_freq=args.control_freq,
+        camera_name='birdview',
+        camera_depth=False,
         obj_names=obj_names
     )
 
 
-    info_dir = args.alg + '_' + args.network + '_' + str(args.num_layers) + 'layer_' +\
+    info_dir = 'imgs_' + args.alg + '_' + args.network + '_' +\
                str(args.lr) + 'lr_' + str(args.nsteps) + 'stpes_' + str(args.num_envs) + 'async_' + args.debug
 
     args.save_dir = os.path.join(PATH, args.out_dir, info_dir)
@@ -87,7 +94,7 @@ if __name__ == "__main__":
 
     args.save_path = os.path.join(args.save_dir, 'model.pth')
 
-    env = MyGymWrapper(env, (low, high), num_envs=args.num_envs)
+    env = MyGymWrapper(env, (low, high), num_envs=args.num_envs, keys='image')
     env = Monitor(env, args.save_dir, allow_early_resets=True)
     env = DummyVecEnv([lambda: env])
     # env = VecNormalize(env)
