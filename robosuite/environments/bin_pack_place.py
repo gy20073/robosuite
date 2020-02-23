@@ -23,6 +23,7 @@ from robosuite.models.objects import (
 
 from robosuite.models.tasks import BinPackingTask, UniformRandomSampler
 
+import time
 
 class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
     def __init__(
@@ -50,7 +51,7 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         camera_width=256,
         camera_depth=False,
 
-        obj_names=['Milk'] * 4 + ['Bread'] * 3,
+        obj_names=['Milk'] *0 + ['Bread'] *1 + ['Can']*1,
     ):
         """
         Args:
@@ -364,11 +365,13 @@ class BinPackPlace(SawyerEnv, mujoco_env.MujocoEnv):
         for i in range(len(self.ob_inits)):
             obj_str = str(self.item_names[i])
             self.obj_body_id[obj_str] = self.sim.model.body_name2id(obj_str)
-            self.obj_geom_id[obj_str] = self.sim.model.geom_name2id(obj_str)
+            # comment out the single geom assumption of the object
+            #self.obj_geom_id[obj_str] = self.sim.model.geom_name2id(obj_str)
 
         # for checking distance to / contact with objects we want to pick up
         self.target_object_body_ids = list(map(int, self.obj_body_id.values()))
-        self.contact_with_object_geom_ids = list(map(int, self.obj_geom_id.values()))
+        # comment out the single geom assumption of the object
+        #self.contact_with_object_geom_ids = list(map(int, self.obj_geom_id.values()))
 
         # keep track of which objects are in their corresponding bins
         self.objects_in_bins = np.zeros(len(self.ob_inits))
